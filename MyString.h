@@ -17,7 +17,7 @@
  * @isCycic != 0 - search also for cyclic appearnce 
  * @return number appearance of str2 as substring of str1
  */
-unsigned int countSubStr(const char* str1, const char* str2, int isCyclic); 
+unsigned int countSubStr(const char* str1, const char* str2, int isCyclic);
 
 #endif
 
