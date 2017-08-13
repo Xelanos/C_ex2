@@ -3,11 +3,11 @@
 #include "MyString.h"
 
 
-int main(int argc, char *argv[])
-{
-    printf("%d",countSubStr(argv[1],argv[2],1));
-    return 0;
-}
+//int main(int argc, char *argv[])
+//{
+//    printf("%d",countSubStr(argv[1],argv[2],1));
+//    return 0;
+//}
 
 /*
  * Let n = len(str1) | m = len(str2)

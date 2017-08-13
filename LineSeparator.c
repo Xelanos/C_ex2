@@ -1,11 +1,18 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
+#include <errno.h>
 #include "LineSeparator.h"
 
 #define NO_MULT 1
+#define READ "r"
+#define DECIMAL 10
+#define MAX_LINE_LENGTH 400
+#define MAX_DIEMANSIONS 200
+#define LOWER_POSITIVE_BOUND 0.00001
 
 
-int dotProduct(const int *firstVector, const int *secondVector, int numberOfDimensions)
+double dotProduct(const double *firstVector, const double *secondVector, int numberOfDimensions)
 {
     assert(firstVector != NULL && secondVector != NULL && numberOfDimensions > 1);
     int product = 0;
@@ -16,44 +23,103 @@ int dotProduct(const int *firstVector, const int *secondVector, int numberOfDime
     return product;
 }
 
-void linearVectorAdding(const int firstVector[], int firstVectorMultiplayer,
-                        const int secondVector[], int secondVectorMultiplayer,
-                        int numberOfDimensions, int destination[])
+void linearVectorAdding(const double firstVector[], double firstVectorMultiplayer,
+                        const double secondVector[], double secondVectorMultiplayer,
+                        int numberOfDimensions, double destination[])
 {
-    assert(sizeof(*destination) == numberOfDimensions);
+    assert(firstVector != NULL && secondVector != NULL && destination != NULL);
     for (int i = 0; i < numberOfDimensions; ++i)
     {
         destination[i] = firstVectorMultiplayer * firstVector[i] + secondVectorMultiplayer * secondVector[i];
     }
 }
 
-int trainAlgoritm(Point pointsArray[], int numberOfPoints, int numberOfDimensions, int *destination)
+
+void makePointFromLine(char line[MAX_LINE_LENGTH], int dimensions, Point *pointToWrite)
 {
+    char *endChar = line;
+    for (int i = 0; i < dimensions; ++i)
+    {
+        pointToWrite->vector[i] = strtod(endChar, &endChar);
+        endChar++;
+    }
+    pointToWrite->value = strtol(endChar, NULL, DECIMAL);
+}
+
+
+void trainAlgorithm(FILE *sourceFile, int numberOfPoints, int numberOfDimensions, double wVector[])
+{
+    char line[MAX_LINE_LENGTH];
+    Point currentPoint = {0, 0};
+    double tempDotProduct;
+
     for (int i = 0; i < numberOfPoints; ++i)
     {
-        Point currentPoint = pointsArray[i];
-        int *tempVector = currentPoint.vector;
-        int tempDotProduct = dotProduct(tempVector, destination, numberOfDimensions);
+        fgets(line, MAX_LINE_LENGTH, sourceFile);
+        makePointFromLine(line, numberOfDimensions, &currentPoint);
+        tempDotProduct = dotProduct(currentPoint.vector, wVector, numberOfDimensions);
         if (tempDotProduct != currentPoint.value)
         {
-            linearVectorAdding(destination, NO_MULT, tempVector, tempDotProduct, numberOfDimensions, destination);
+            linearVectorAdding(wVector, NO_MULT, currentPoint.vector, currentPoint.value, numberOfDimensions, wVector);
         }
     }
 }
 
-int tagPoints(Point pointsToTag[],int* normVector, int numberOfPoints, int numberOfDimensions)
+void tagVectors(FILE *sourcrFile, int dimensions, double wVector[])
 {
-    for (int i = 0; i < numberOfPoints; ++i)
+    char line[MAX_LINE_LENGTH];
+    char *endChar;
+    double vectorToTag[MAX_DIEMANSIONS];
+
+    while (fgets(line, MAX_LINE_LENGTH, sourcrFile) != NULL)
     {
-        Point currentPoint = pointsToTag[i];
-        if (dotProduct(currentPoint.vector, normVector, numberOfDimensions) > 0)
+        endChar = line;
+        for (int i = 0; i < dimensions; ++i)
         {
-            currentPoint.value = 1;
+            vectorToTag[i] = strtod(endChar, &endChar);
+            endChar++;
+        }
+        if (dotProduct(vectorToTag, wVector, dimensions) > LOWER_POSITIVE_BOUND)
+        {
+            printf("%d\n", 1);
         } else
         {
-            currentPoint.value = -1;
+            printf("%d\n", -1);
         }
     }
+
 }
+
+int main(int argc, char *argv[])
+{
+    int numberOfDimensions, numberOfTraningPoints;
+    char tempLine[MAX_LINE_LENGTH];
+    double wVector[MAX_DIEMANSIONS] = {0};
+
+    char *fileName = argv[1];
+    FILE *sourceFile = fopen(fileName, READ);
+    if (sourceFile == NULL)
+    {
+        perror("Problem with source file");
+        return 1;
+    }
+
+    numberOfDimensions = strtol(fgets(tempLine, MAX_LINE_LENGTH, sourceFile), NULL, DECIMAL);
+    numberOfTraningPoints = strtol(fgets(tempLine, MAX_LINE_LENGTH, sourceFile), NULL, DECIMAL);
+    assert(numberOfDimensions > 1 && numberOfTraningPoints >= 1 && errno == 0);
+
+    trainAlgorithm(sourceFile, numberOfTraningPoints, numberOfDimensions, wVector);
+
+    tagVectors(sourceFile, numberOfDimensions, wVector);
+
+
+    if (fclose(sourceFile))
+    {
+        fprintf(stderr, "Could not close source file");
+        return 1;
+    }
+    return 0;
+}
+
 
 
