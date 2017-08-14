@@ -9,9 +9,10 @@
 #define LOWER_POSITIVE_BOUND 0.00001
 #define FILE_OPEN_ERR "Problem with source file"
 #define FILE_CLOSING_ERR "Could not close source file"
-
 #define ABOVE_PLANE 1
-#define BELOW_PLANE -1
+#define BELOW_PLANE (-1)
+#define ARG_ERR "Wrong number of arguments"
+
 typedef struct Point
 {
     double vector[MAX_DIEMANSIONS];

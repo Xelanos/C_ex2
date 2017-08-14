@@ -56,7 +56,7 @@ void makePointFromLine(char *line, int dimensions, Point *pointToWrite)
 void trainAlgorithm(FILE *sourceFile, int numberOfPoints, int numberOfDimensions, double *wVector)
 {
     char line[MAX_LINE_LENGTH];
-    Point currentPoint = {0, 0};
+    Point currentPoint = {.vector = {0}, .value = 0};
     int tempDotProduct;
 
     for (int i = 0; i < numberOfPoints; ++i)
@@ -108,6 +108,11 @@ void tagVectors(FILE *sourcrFile, int dimensions, double *wVector)
 
 int main(int argc, char *argv[])
 {
+    if(argc != 2)
+    {
+        fprintf(stderr, ARG_ERR);
+        return 2;
+    }
     int numberOfDimensions, numberOfTraningPoints;
     char tempLine[MAX_LINE_LENGTH];
     double wVector[MAX_DIEMANSIONS] = {0};
