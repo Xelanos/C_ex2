@@ -3,18 +3,12 @@
 #include "MyString.h"
 
 
-//int main(int argc, char *argv[])
-//{
-//    printf("%d",countSubStr(argv[1],argv[2],1));
-//    return 0;
-//}
-
 /*
  * Let n = len(str1) | m = len(str2)
  * If function is not cyclic this runs at O(n).
  * If function is cyclic this runs at O(n+m).
  *
- * Basis of my algorithm assumes that if cyclic then we can find just one more match,
+ * Basis of the algorithm assumes that if cyclic then we can find just one more match,
  * because otherwise we would have gotten a match in the non-cyclic case.
  * So if cyclic, the function stops at the find of the match, or at the first sight
  * of a failed match.
@@ -31,12 +25,14 @@ unsigned int countSubStr(const char *str1, const char *str2, int isCyclic)
         if (*currentStr1Char == *currentStr2Char)
         {
             currentStr2Char++;
-        } else
+        }
+        else
         {
             if (currentStr2Char != str2)
             {
                 currentStr2Char = str2;
-            } else
+            }
+            else
             {
                 currentStr1Char++;
             }
@@ -64,7 +60,8 @@ unsigned int countSubStr(const char *str1, const char *str2, int isCyclic)
                 {
                     currentStr1Char = str1;
                 }
-            } else
+            }
+            else
             {
                 return numberOfMatches;
             }
